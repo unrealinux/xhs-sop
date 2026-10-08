@@ -31,3 +31,7 @@ __pycache__/
 Thumbs.db
 .idea/
 .vscode/
+
+# 个人选品记录（含竞品情报与成本数据，不入公开仓库）
+拍摄计划-*.md
+选品SOP-*.md
