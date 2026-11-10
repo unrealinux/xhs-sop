@@ -52,6 +52,24 @@ def on_login_page(pg):
         return True
 
 
+QR_ICON = (1263, 305)  # 登录卡片右上角的二维码图标（1440x900 视口下实测）
+
+
+def ensure_qr(pg):
+    """默认是短信登录，要先切到扫码。"""
+    try:
+        if "扫码" in pg.inner_text("body"):
+            return True
+    except Exception:
+        pass
+    pg.mouse.click(*QR_ICON)
+    pg.wait_for_timeout(3000)
+    try:
+        return "扫码" in pg.inner_text("body")
+    except Exception:
+        return False
+
+
 def wait_login(pg, minutes=10):
     """等扫码，以离开 /login 为准。"""
     pg.bring_to_front()
@@ -99,6 +117,7 @@ def cmd_login(a):
         ctx = open_ctx(p, a.headless)
         pg = ctx.pages[0] if ctx.pages else ctx.new_page()
         goto(pg, LOGIN, 6000)
+        ensure_qr(pg)
         wait_login(pg, a.minutes)
         ctx.close()
 
@@ -120,6 +139,7 @@ def cmd_draft(a):
         goto(pg, PUBLISH, 9000)
         if on_login_page(pg):
             goto(pg, LOGIN, 5000)
+            ensure_qr(pg)
             if not wait_login(pg, a.minutes):
                 ctx.close()
                 return
